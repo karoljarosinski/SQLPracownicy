@@ -1,1 +1,106 @@
-pusty
+CREATE DATABASE pracownicy;
+-- 1. Tworzy tabelę pracownik(imie, nazwisko, wyplata, data urodzenia, stanowisko). W tabeli mogą być dodatkowe kolumny, które uznasz za niezbędne.
+CREATE TABLE pracownik (
+id INT PRIMARY KEY AUTO_INCREMENT,
+imie VARCHAR(30) NOT NULL,
+nazwisko VARCHAR(30) NOT NULL,
+wyplata INT NOT NULL,
+data_urodzenia DATE NOT NULL,
+stanowisko VARCHAR(30) NOT NULL
+);
+-- 2. Wstawia do tabeli co najmniej 6 pracowników
+INSERT INTO pracownik 
+	(imie, nazwisko, wyplata, data_urodzenia, stanowisko)
+VALUES
+	('Jan', 'Kowalski', 2000, '1990-05-05', 'Mechanik'),
+    ('Stefan', 'Michalski', 3500, '1962-07-02', 'Inzynier'),
+    ('Agata', 'Trembacka', 2100, '1979-09-05', 'Grafik'),
+    ('Kordian', 'Taktaki', 2300, '1978-01-13', 'Technik'),
+    ('Ewa', 'Gawronska', 3330, '1950-12-12', 'Analityk'),
+    ('Andrzej', 'Andrzejewski', 2140, '1990-05-05', 'Specjalista'),
+    ('Michal', 'Stanowski', 2000, '1990-05-05', 'Mechanik')
+    ;
+    
+-- 3.  Pobiera wszystkich pracowników i wyświetla ich w kolejności alfabetycznej po nazwisku
+SELECT * FROM
+pracownik
+ORDER BY
+nazwisko ASC;
+
+-- 4.  Pobiera pracowników na wybranym stanowisku
+SELECT * FROM 
+pracownik
+WHERE
+stanowisko = 'Specjalista';
+
+-- 5. Pobiera pracowników, którzy mają co najmniej 30 lat
+SELECT * FROM pracownik
+WHERE EXTRACT(YEAR FROM NOW()) - EXTRACT(YEAR FROM data_urodzenia) >= 30;
+
+-- 6. Zwiększa wypłatę pracowników na wybranym stanowisku o 10%
+UPDATE pracownik
+SET wyplata = wyplata + (wyplata * 0.1)
+WHERE
+stanowisko = 'Mechanik';
+
+-- 7.  Usuwa najmłodszego pracownika
+DELETE FROM pracownik
+ORDER BY data_urodzenia DESC
+LIMIT 1;
+
+-- 8. Usuwa tabelę pracownik
+DROP TABLE pracownik;
+
+-- 9. Tworzy tabelę stanowisko (nazwa stanowiska, opis, wypłata na danym stanowisku)
+CREATE TABLE stanowisko (
+id INT PRIMARY KEY AUTO_INCREMENT,
+nazwa VARCHAR(30) NOT NULL,
+opis VARCHAR (100) NOT NULL,
+wyplata_stanowiska INT NOT NULL
+);
+    
+-- 10. Tworzy tabelę adres (ulica+numer domu/mieszkania, kod pocztowy, miejscowość)
+CREATE TABLE adres (
+id INT PRIMARY KEY AUTO_INCREMENT,
+ulica VARCHAR(50) NOT NULL,
+numer_domu INT NOT NULL,
+numer_mieszkania INT,
+kod_pocztowy INT NOT NULL,
+miejscowosc VARCHAR(50) NOT NULL
+);
+-- 11. Tworzy tabelę pracownik (imię, nazwisko) + relacje do tabeli stanowisko i adres
+CREATE TABLE pracownik2 (
+id INT PRIMARY KEY AUTO_INCREMENT,
+imie VARCHAR(30) NOT NULL,
+nazwisko VARCHAR(30) NOT NULL,
+stanowisko_id INT NOT NULL,
+adres_id INT NOT NULL,
+FOREIGN KEY (stanowisko_id) REFERENCES stanowisko(id),
+FOREIGN KEY (adres_id) REFERENCES adres(id)
+);
+
+-- 12. Dodaje dane testowe (w taki sposób, aby powstały pomiędzy nimi sensowne powiązania)
+INSERT INTO pracownik2
+	(imie, nazwisko, stanowisko_id, adres_id)
+VALUES
+	('Stefan', 'Stefanski', 1, 1),
+	('Andrzej', 'Andrzejewski', 1, 2),
+	('Agata', 'Taka', 2, 3)
+    ;
+-- 13. Pobiera pełne informacje o pracowniku (imię, nazwisko, adres, stanowisko)
+SELECT 
+pracownik2.imie, pracownik2.nazwisko, stanowisko.nazwa, stanowisko.opis, stanowisko.wyplata_stanowiska, adres.ulica, adres.numer_domu, adres.numer_mieszkania, adres.kod_pocztowy, adres.miejscowosc
+FROM pracownik2
+JOIN stanowisko ON stanowisko_id = stanowisko.id
+JOIN adres ON adres_id = adres.id
+;
+-- 14. Oblicza sumę wypłat dla wszystkich pracowników w firmie
+
+-- 15. Pobiera pracowników mieszkających w lokalizacji z kodem pocztowym 90210 (albo innym, który będzie miał sens dla Twoich danych testowych)
+SELECT 
+pracownik2.imie, pracownik2.nazwisko, stanowisko.nazwa, stanowisko.opis, stanowisko.wyplata_stanowiska, adres.ulica, adres.numer_domu, adres.numer_mieszkania, adres.kod_pocztowy, adres.miejscowosc
+FROM pracownik2
+JOIN stanowisko ON stanowisko_id = stanowisko.id
+JOIN adres ON adres_id = adres.id
+WHERE kod_pocztowy = 39500;
+;
