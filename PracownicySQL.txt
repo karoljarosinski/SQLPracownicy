@@ -4,7 +4,7 @@ CREATE TABLE pracownik (
 id INT PRIMARY KEY AUTO_INCREMENT,
 imie VARCHAR(30) NOT NULL,
 nazwisko VARCHAR(30) NOT NULL,
-wyplata INT NOT NULL,
+wyplata DECIMAL(10,2) NOT NULL,
 data_urodzenia DATE NOT NULL,
 stanowisko VARCHAR(30) NOT NULL
 );
@@ -20,6 +20,7 @@ VALUES
     ('Andrzej', 'Andrzejewski', 2140, '1990-05-05', 'Specjalista'),
     ('Michal', 'Stanowski', 2000, '1990-05-05', 'Mechanik')
     ;
+
     
 -- 3.  Pobiera wszystkich pracowników i wyświetla ich w kolejności alfabetycznej po nazwisku
 SELECT * FROM
@@ -39,7 +40,7 @@ WHERE EXTRACT(YEAR FROM NOW()) - EXTRACT(YEAR FROM data_urodzenia) >= 30;
 
 -- 6. Zwiększa wypłatę pracowników na wybranym stanowisku o 10%
 UPDATE pracownik
-SET wyplata = wyplata + (wyplata * 0.1)
+SET wyplata = wyplata * 1.1
 WHERE
 stanowisko = 'Mechanik';
 
@@ -56,7 +57,7 @@ CREATE TABLE stanowisko (
 id INT PRIMARY KEY AUTO_INCREMENT,
 nazwa VARCHAR(30) NOT NULL,
 opis VARCHAR (100) NOT NULL,
-wyplata_stanowiska INT NOT NULL
+wyplata_stanowiska DECIMAL(10,2) NOT NULL
 );
     
 -- 10. Tworzy tabelę adres (ulica+numer domu/mieszkania, kod pocztowy, miejscowość)
@@ -85,7 +86,8 @@ INSERT INTO pracownik2
 VALUES
 	('Stefan', 'Stefanski', 1, 1),
 	('Andrzej', 'Andrzejewski', 1, 2),
-	('Agata', 'Taka', 2, 3)
+	('Agata', 'Taka', 2, 3),
+    ('Owaki', 'Siaki', 3, 3)
     ;
 -- 13. Pobiera pełne informacje o pracowniku (imię, nazwisko, adres, stanowisko)
 SELECT 
@@ -95,10 +97,12 @@ JOIN stanowisko ON stanowisko_id = stanowisko.id
 JOIN adres ON adres_id = adres.id
 ;
 -- 14. Oblicza sumę wypłat dla wszystkich pracowników w firmie
+SELECT SUM(wyplata_stanowiska) from stanowisko
+JOIN pracownik2 ON stanowisko.id = stanowisko_id;
 
 -- 15. Pobiera pracowników mieszkających w lokalizacji z kodem pocztowym 90210 (albo innym, który będzie miał sens dla Twoich danych testowych)
 SELECT 
-pracownik2.imie, pracownik2.nazwisko, stanowisko.nazwa, stanowisko.opis, stanowisko.wyplata_stanowiska, adres.ulica, adres.numer_domu, adres.numer_mieszkania, adres.kod_pocztowy, adres.miejscowosc
+pracownik2.imie, pracownik2.nazwisko, adres.kod_pocztowy
 FROM pracownik2
 JOIN stanowisko ON stanowisko_id = stanowisko.id
 JOIN adres ON adres_id = adres.id
